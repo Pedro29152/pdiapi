@@ -81,7 +81,6 @@ namespace PdiApi.Controllers
             }
             await contratoRepository.DeleteAsync(contrato);
             return Ok(contrato);
-         
         }
     }
 }
