@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PdiApi.Models;
 using PdiApi.Models.NotasFiscais;
+using PdiApi.Models.Util;
 using PdiApi.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -26,9 +28,12 @@ namespace PdiApi.Repository.NotasFiscais
             return await DbSet.FindAsync(id);
         }
 
-        public async Task<IList<Cliente>> GetAllAsync()
+        public async Task<IList<Cliente>> GetAllAsync(Pagination pagination)
         {
-            return await DbSet.ToListAsync();
+            return await DbSet
+                .Skip(pagination.GetSkip())
+                .Take(pagination.PageSize)
+                .ToListAsync();
         }
 
         public async Task<Cliente> AddAsync(Cliente cliente)
@@ -55,5 +60,9 @@ namespace PdiApi.Repository.NotasFiscais
             await Context.SaveChangesAsync();
         }
 
+        public async Task<int> GetCountAsync()
+        {
+            return await DbSet.CountAsync();
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PdiApi.Models;
 using PdiApi.Models.NotasFiscais;
+using PdiApi.Models.Util;
 using PdiApi.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -31,9 +33,11 @@ namespace PdiApi.Repository.NotasFiscais
                 .FirstOrDefaultAsync(r => r.Id.Equals(id));
         }
 
-        public async Task<IList<Receita>> GetAllAsync()
+        public async Task<IList<Receita>> GetAllAsync(Pagination pagination)
         {
             return await DbSet
+                .Skip(pagination.GetSkip())
+                .Take(pagination.PageSize)
                 .Include(r => r.Cliente)
                 .Include(r => r.Contrato)
                 .ToListAsync();
@@ -62,6 +66,11 @@ namespace PdiApi.Repository.NotasFiscais
         {
             DbSet.Update(receita);
             await Context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetCountAsync()
+        {
+            return await DbSet.CountAsync();
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PdiApi.Models;
 using PdiApi.Models.NotasFiscais;
+using PdiApi.Models.Util;
 using PdiApi.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -22,11 +24,18 @@ namespace PdiApi.Controllers
             this.clienteRepository = clienteRepository;
         }
 
-        // GET: api/<ClienteController>
         [HttpGet]
-        public async Task<IList<Cliente>> Get()
+        public async Task<Paginated<Cliente>> Get([FromQuery] Pagination pagination)
         {
-            return await clienteRepository.GetAllAsync();
+            var Clientes = clienteRepository.GetAllAsync(pagination);
+            var Count = clienteRepository.GetCountAsync();
+            var Ret = new Paginated<Cliente>(
+                pagination.Page,
+                (await Clientes).Count,
+                await Count,
+                await Clientes
+            );
+            return Ret;
         }
 
         [HttpGet("{id}")]
@@ -39,7 +48,6 @@ namespace PdiApi.Controllers
             return Ok(cliente);
         }
 
-        // POST api/<ClienteController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Cliente cliente)
         {
@@ -55,7 +63,6 @@ namespace PdiApi.Controllers
             }
         }
 
-        // PUT api/<ClienteController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(Guid id, [FromBody] Cliente cliente)
         {
@@ -64,7 +71,6 @@ namespace PdiApi.Controllers
             return Ok(cliente);
         }
 
-        // DELETE api/<ClienteController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {

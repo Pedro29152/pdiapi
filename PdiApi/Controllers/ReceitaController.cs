@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PdiApi.Models;
 using PdiApi.Models.NotasFiscais;
+using PdiApi.Models.Util;
 using PdiApi.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -21,11 +23,18 @@ namespace PdiApi.Controllers
             this.receitaRepository = receitaRepository;
         }
 
-        // GET: api/<ReceitaController>
         [HttpGet]
-        public async Task<IList<Receita>> Get()
+        public async Task<Paginated<Receita>> Get([FromQuery] Pagination pagination)
         {
-            return await receitaRepository.GetAllAsync();
+            var Receitas = receitaRepository.GetAllAsync(pagination);
+            var Count = receitaRepository.GetCountAsync();
+            var Ret = new Paginated<Receita>(
+                pagination.Page,
+                (await Receitas).Count,
+                await Count,
+                await Receitas
+            );
+            return Ret;
         }
 
         [HttpGet("{id}")]
@@ -38,7 +47,6 @@ namespace PdiApi.Controllers
             return Ok(receita);
         }
 
-        // POST api/<ReceitaController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Receita receita)
         {
@@ -54,7 +62,6 @@ namespace PdiApi.Controllers
             }
         }
 
-        // PUT api/<ReceitaController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(Guid id, [FromBody] Receita receita)
         {
@@ -63,7 +70,6 @@ namespace PdiApi.Controllers
             return Ok(receita);
         }
 
-        // DELETE api/<ReceitaController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {

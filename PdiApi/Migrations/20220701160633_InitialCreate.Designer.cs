@@ -9,8 +9,8 @@ using PdiApi.Repository;
 namespace PdiApi.Migrations
 {
     [DbContext(typeof(PdiContext))]
-    [Migration("20220606180301_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20220701160633_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

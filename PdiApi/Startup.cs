@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -39,6 +40,11 @@ namespace PdiApi
                 options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
             );
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.KnownProxies.Add(IPAddress.Parse("127.0.0.1"));
+            });
+
             services.AddScoped<IReceitaRepository, ReceitaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
             services.AddScoped<IClienteRepository, ClienteRepository>();
@@ -47,12 +53,14 @@ namespace PdiApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, PdiContext pdiContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            pdiContext.Database.Migrate();
 
             app.UseHttpsRedirection();
 
