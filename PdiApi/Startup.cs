@@ -62,7 +62,7 @@ namespace PdiApi
 
             pdiContext.Database.Migrate();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
